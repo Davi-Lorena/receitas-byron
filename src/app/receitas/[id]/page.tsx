@@ -24,7 +24,7 @@ if(!recipe) {
 
   return (
     <main className="flex-grow py-18">
-        <div className="container mx-auto xl:max-w-[80%]">
+        <div className="container mx-auto max-w-[80%]">
             <Link className="flex text-orange-500 hover:text-orange-700 transition-colors mb-6" href="/receitas">
             <ChevronLeft />
             Voltar para receitas
