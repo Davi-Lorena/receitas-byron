@@ -1,3 +1,4 @@
+import InfoPill from "@/Components/infoPill";
 import { recipes } from "@/lib/data";
 import { ChevronLeft } from "lucide-react";
 import Image from "next/image";
@@ -42,8 +43,11 @@ if(!recipe) {
 </div>
 
 {/* Infos do preparo */}
-<div>
-    {/*TODO: componentes de info */}
+<div className="flex gap-4">
+        <InfoPill title="Preparo" info={recipe.prepTime} />
+        <InfoPill title="Cozimento"info={recipe.cookTime}/>
+        <InfoPill title="Porções"info={recipe.servings}/>
+        <InfoPill title="Categoria"info={recipe.category}/>
 </div>
 
 {/* Colunas */}
