@@ -1,4 +1,5 @@
 import InfoPill from "@/Components/infoPill";
+import PreparationStep from "@/Components/preparationStep";
 import { recipes } from "@/lib/data";
 import { ChevronLeft } from "lucide-react";
 import Image from "next/image";
@@ -24,7 +25,7 @@ if(!recipe) {
   return (
     <main className="flex-grow py-18">
         <div className="container mx-auto">
-            <Link className="flex text-orange-500 hover:text-orange-700 transition-colors mb-6" href="receitas">
+            <Link className="flex text-orange-500 hover:text-orange-700 transition-colors mb-6" href="/receitas">
             <ChevronLeft />
             Voltar para receitas
             </Link>
@@ -66,7 +67,12 @@ if(!recipe) {
 
 <div>
     <h2 className="text-xl font-bold mb-4">Modo de preparo</h2>
-{/* TODO: componente de preparo */}
+<ol className="space-y-4">
+{recipe.instructions.map((instruction, index) => (
+    <PreparationStep key={instruction} index={index + 1} description={instruction} />
+))}
+
+</ol>
 </div>
 
 </div>
