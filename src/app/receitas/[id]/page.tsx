@@ -24,7 +24,7 @@ if(!recipe) {
 
   return (
     <main className="flex-grow py-18">
-        <div className="container mx-auto xl:max-w-[80%]">
+        <div className="container mx-auto max-w-[80%]">
             <Link className="flex text-orange-500 hover:text-orange-700 transition-colors mb-6" href="/receitas">
             <ChevronLeft />
             Voltar para receitas
@@ -44,7 +44,7 @@ if(!recipe) {
 </div>
 
 {/* Infos do preparo */}
-<div className="flex gap-4">
+<div className="flex flex-wrap justify-center sm:justify-start gap-4">
         <InfoPill title="Preparo" info={recipe.prepTime} />
         <InfoPill title="Cozimento"info={recipe.cookTime}/>
         <InfoPill title="Porções"info={recipe.servings}/>
@@ -53,7 +53,7 @@ if(!recipe) {
 
 {/* Colunas */}
 
-<div className="grid grid-cols-2 gap-4">
+<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
     {/* Ingredientes */}
 <div> 
     <h2 className="text-xl font-bold mb-4">Ingredientes</h2>
