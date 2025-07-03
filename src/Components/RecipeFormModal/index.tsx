@@ -1,6 +1,6 @@
 import { Recipe } from "@/lib/data";
 import { Dialog, DialogContent, DialogTitle, DialogHeader } from "../ui/dialog";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import {
   recipeFormData,
   recipeSchema,
@@ -12,6 +12,18 @@ interface RecipeFormModalProps {
   onClose: () => void;
 }
 
+const DEFAULT_VALUES: recipeFormData = {
+    title: "",
+    category: "",
+    description: "",
+    imageUrl: "",
+    prepTime: 0,
+    cookTime: 0,
+    servings: 0,
+    ingredients: [{ value: ""}],
+    instructions: [{ value: ""}],
+};
+
 export default function RecipeFormModal({
   isOpen,
   onClose,
@@ -21,9 +33,29 @@ export default function RecipeFormModal({
     reset,
     handleSubmit,
     formState: { errors },
+    control
   } = useForm<recipeFormData>({
     resolver: yupResolver(recipeSchema),
     mode: "onSubmit",
+    defaultValues: DEFAULT_VALUES,
+  });
+
+  const {
+    fields: ingredientFields,
+    append: appendIngredients,
+    remove: removeIngredients,
+  } = useFieldArray({
+    control,
+    name: "ingredients",
+  });
+
+  const {
+    fields: instructionFields,
+    append: appendInstructions,
+    remove: removeInstructions,
+  } = useFieldArray({
+    control,
+    name: "instructions",
   });
 
   const onSubmit = (data: recipeFormData) => {
@@ -36,7 +68,7 @@ export default function RecipeFormModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-white">
+      <DialogContent className="bg-white ">
         <DialogHeader>
           <DialogTitle> Criar nova receita</DialogTitle>
         </DialogHeader>
@@ -168,18 +200,21 @@ export default function RecipeFormModal({
           <div className="flex flex-col gap-1">
             <label htmlFor="ingredients">Ingredientes</label>
             <div className="flex flex-col gap-2">
+                
               {/* Conteúdo */}
-              <div className="flex gap-2 w-full">
-                <input id="ingredients" className={inputStyle} type="text" />
-                <button
+              {ingredientFields.map((field, index) => ( 
+                <div key={field.id} className="flex gap-2 w-full">
+                <input id="ingredients" className={inputStyle} type="text" {...register(`ingredients.${index}.value`)} placeholder="Digite um ingrediente"/>
+               { ingredientFields.length > 1 && <button onClick={() => removeIngredients(index)}
                   type="button"
-                  className="bg-white border border-zinc-300 rounded-md hover:bg-gray-100 transition-colors px-4 py-2 font-medium"
+                  className="bg-white border border-zinc-300 rounded-md hover:bg-gray-100 transition-colors px-4 py-2 font-medium h-fit"
                 >
                   Remover
-                </button>
+                </button>}
               </div>
+              ))}
 
-              <button
+              <button onClick={() => appendIngredients({ value: ""})}
                 type="button"
                 className="bg-white border border-zinc-300 rounded-md hover:bg-gray-100 transition-colors px-4 py-2 font-medium w-fit"
               >
@@ -194,21 +229,23 @@ export default function RecipeFormModal({
             <label htmlFor="instructions">Instruções</label>
             <div className="flex flex-col gap-2">
               {/* Conteúdo */}
-              <div className="flex gap-2">
-                <textarea id="instructions" className={inputStyle} />
-                <button
+               {instructionFields.map((field, index) => ( 
+                <div key={field.id} className="flex gap-2 w-full">
+                <textarea id="instruction" className={inputStyle} {...register(`instructions.${index}.value`)} placeholder="Digite uma instrução"/>
+               { instructionFields.length > 1 && <button onClick={() => removeInstructions(index)}
                   type="button"
                   className="bg-white border border-zinc-300 rounded-md hover:bg-gray-100 transition-colors px-4 py-2 font-medium h-fit"
                 >
                   Remover
-                </button>
+                </button>}
               </div>
+              ))}
 
-              <button
+              <button onClick={() => appendInstructions({ value: ""})}
                 type="button"
                 className="bg-white border border-zinc-300 rounded-md hover:bg-gray-100 transition-colors px-4 py-2 font-medium w-fit"
               >
-                Adicionar ingrediente
+                Adicionar instrução
               </button>
             </div>
           </div>
