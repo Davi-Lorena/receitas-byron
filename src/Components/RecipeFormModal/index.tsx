@@ -59,16 +59,22 @@ export default function RecipeFormModal({
   });
 
   const onSubmit = (data: recipeFormData) => {
-    console.log(data);
+const recipeData = {
+    ...data,
+    ingredientes: data.ingredients.map((ingredient) => ingredient.value),
+    instructions: data.instructions.map((instruction) => instruction.value),
+}
+
+    console.log(recipeData);
     reset();
     onClose();
   };
 
-  const inputStyle = "p-2 border border-zinc-200 rounded-md flex-grow";
+  const inputStyle = "p-2 border border-zinc-200 rounded-md flex-grow w-full";
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-white ">
+      <DialogContent className="bg-white md:max-w-2xl overflow-y-scroll max-h-[90dvh]">
         <DialogHeader>
           <DialogTitle> Criar nova receita</DialogTitle>
         </DialogHeader>
@@ -204,7 +210,14 @@ export default function RecipeFormModal({
               {/* Conteúdo */}
               {ingredientFields.map((field, index) => ( 
                 <div key={field.id} className="flex gap-2 w-full">
-                <input id="ingredients" className={inputStyle} type="text" {...register(`ingredients.${index}.value`)} placeholder="Digite um ingrediente"/>
+               <div className="flex-grow">
+                 <input id="ingredients" className={inputStyle} type="text" {...register(`ingredients.${index}.value`)} placeholder="Digite um ingrediente"/>
+                {errors.ingredients?.[index]?.value && (
+                  <span className="text-red-500 text-sm">
+                    {errors.ingredients?.[index].value.message}
+                  </span>
+                )}
+               </div>
                { ingredientFields.length > 1 && <button onClick={() => removeIngredients(index)}
                   type="button"
                   className="bg-white border border-zinc-300 rounded-md hover:bg-gray-100 transition-colors px-4 py-2 font-medium h-fit"
@@ -231,7 +244,14 @@ export default function RecipeFormModal({
               {/* Conteúdo */}
                {instructionFields.map((field, index) => ( 
                 <div key={field.id} className="flex gap-2 w-full">
-                <textarea id="instruction" className={inputStyle} {...register(`instructions.${index}.value`)} placeholder="Digite uma instrução"/>
+                <div className="flex-grow">
+                    <textarea id="instruction" className={inputStyle} {...register(`instructions.${index}.value`)} placeholder="Digite uma instrução"/>
+                {errors.instructions?.[index]?.value && (
+                  <span className="text-red-500 text-sm">
+                    {errors.instructions?.[index].value.message}
+                  </span>
+                )}
+                </div>
                { instructionFields.length > 1 && <button onClick={() => removeInstructions(index)}
                   type="button"
                   className="bg-white border border-zinc-300 rounded-md hover:bg-gray-100 transition-colors px-4 py-2 font-medium h-fit"
