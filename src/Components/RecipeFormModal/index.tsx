@@ -10,16 +10,17 @@ import { yupResolver } from "@hookform/resolvers/yup";
 interface RecipeFormModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSave: (recipe: Omit<Recipe, "id">) => void;
 }
 
 const DEFAULT_VALUES: recipeFormData = {
     title: "",
     category: "",
     description: "",
-    imageUrl: "",
-    prepTime: 0,
-    cookTime: 0,
-    servings: 0,
+    image: "",
+    prepTime: "",
+    cookTime: "",
+    servings: 1,
     ingredients: [{ value: ""}],
     instructions: [{ value: ""}],
 };
@@ -27,6 +28,7 @@ const DEFAULT_VALUES: recipeFormData = {
 export default function RecipeFormModal({
   isOpen,
   onClose,
+  onSave,
 }: RecipeFormModalProps) {
   const {
     register,
@@ -61,11 +63,12 @@ export default function RecipeFormModal({
   const onSubmit = (data: recipeFormData) => {
 const recipeData = {
     ...data,
-    ingredientes: data.ingredients.map((ingredient) => ingredient.value),
+    ingredients: data.ingredients.map((ingredient) => ingredient.value),
     instructions: data.instructions.map((instruction) => instruction.value),
 }
 
     console.log(recipeData);
+    onSave(recipeData);
     reset();
     onClose();
   };
@@ -134,16 +137,16 @@ const recipeData = {
 
           {/* URL da imagem */}
           <div className="flex flex-col gap-1">
-            <label htmlFor="imageUrl">URL da imagem</label>
+            <label htmlFor="image">URL da imagem</label>
             <input
               className={inputStyle}
               id="text"
               placeholder="https://example.com/image.jpg"
-              {...register("imageUrl")}
+              {...register("image")}
             />
-            {errors.imageUrl && (
+            {errors.image && (
               <span className="text-red-500 text-sm">
-                {errors.imageUrl.message}
+                {errors.image.message}
               </span>
             )}
           </div>
