@@ -6,11 +6,14 @@ import {
   recipeSchema,
 } from "@/lib/formValidationSchemas/recipeSchema";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useEffect } from "react";
 
 interface RecipeFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (recipe: Omit<Recipe, "id">) => void;
+  onSave: (recipe: Omit<Recipe, "id"> | Recipe) => void;
+  mode: "create" | "edit"
+  recipe?: Recipe
 }
 
 const DEFAULT_VALUES: recipeFormData = {
@@ -29,6 +32,8 @@ export default function RecipeFormModal({
   isOpen,
   onClose,
   onSave,
+  mode,
+  recipe
 }: RecipeFormModalProps) {
   const {
     register,
@@ -60,6 +65,20 @@ export default function RecipeFormModal({
     name: "instructions",
   });
 
+  useEffect(() => {
+    if (isOpen) {
+      if(mode === "edit" && recipe) {
+        reset({
+          ...recipe,
+          ingredients: recipe.ingredients.map((ingredient) => ({ value: ingredient })),
+          instructions: recipe.instructions.map((instruction) => ({ value: instruction })),
+        });
+      } else {
+        reset(DEFAULT_VALUES);
+      }
+    }
+  }, [mode, isOpen, recipe, reset]);
+
   const onSubmit = (data: recipeFormData) => {
 const recipeData = {
     ...data,
@@ -68,7 +87,7 @@ const recipeData = {
 }
 
     console.log(recipeData);
-    onSave(recipeData);
+    onSave(mode === "edit" && recipe ? { ...recipeData, id: recipe.id } : recipeData);
     reset();
     onClose();
   };
@@ -79,7 +98,7 @@ const recipeData = {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="bg-white md:max-w-2xl overflow-y-scroll max-h-[90dvh]">
         <DialogHeader>
-          <DialogTitle> Criar nova receita</DialogTitle>
+          <DialogTitle>{mode === "create" ? "Nova receita" : "Editar receita"}</DialogTitle>
         </DialogHeader>
 
         <form
@@ -286,7 +305,7 @@ const recipeData = {
               type="submit"
               className="bg-black rounded-md hover:bg-gray-800 transition-colors px-4 py-2 font-medium text-white"
             >
-              Criar receita
+              {mode === "create" ? "Criar receita" : "Salvar alterações"}
             </button>
           </div>
         </form>

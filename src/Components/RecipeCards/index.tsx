@@ -6,19 +6,20 @@ import React from "react";
 
 interface RecipeCardProps {
   recipe: Recipe;
+  onEdit: () => void;
 }
 
-const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
+
+export default function RecipeCard({ recipe, onEdit }: RecipeCardProps) {
+
+  const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
+    onEdit()
 }
 
 const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
 }
-
-
-export default function RecipeCard({ recipe }: RecipeCardProps) {
-
 
   return (
     <Link href={`/receitas/${recipe.id}`}>
