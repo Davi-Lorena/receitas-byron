@@ -5,9 +5,8 @@ import RecipeCard from "@/Components/RecipeCards";
 import RecipeFormModal from "@/Components/RecipeFormModal";
 import { recipes as initialRecipes } from "@/lib/data";
 import type { Recipe } from "@/lib/data";
-import { Plus } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { useState } from "react";
-import { set } from "react-hook-form";
 
 export default function ReceitasPage() {
 const[isRecipeFormModalOpen, setIsRecipeFormModalOpen] = useState(false)
@@ -15,6 +14,8 @@ const [isDeleteConfirmationModalOpen, setIsDeleteConfirmationModalOpen] = useSta
 const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes)
 const[modalMode, setModalMode] = useState<'create' | 'edit'>('create')
 const [selectedRecipe, setSelectedRecipe] = useState<Recipe | undefined>(undefined)
+
+const [search, setSearch] = useState('')
 
 const handleOpenCreateModal = () => {
     setModalMode('create')
@@ -62,6 +63,19 @@ const handleDeleteRecipe = () => {
     }
 }
 
+const filterRecipes = recipes.filter((recipe) => { 
+     const lowerCaseSearch = search.toLowerCase().replace(/\s/g, '')
+ return ( 
+      recipe.title.toLowerCase().replace(/\s/g, '').includes(lowerCaseSearch) ||
+      recipe.description.toLowerCase().replace(/\s/g, '').includes(lowerCaseSearch) ||
+      recipe.category.toLowerCase().replace(/\s/g, '').includes(lowerCaseSearch) ||
+      recipe.ingredients.some(ingredient =>
+        ingredient.toLowerCase().includes(lowerCaseSearch))
+
+      )
+})
+
+
     return (
         <main className="flex-grow py-8">
             <div className="container mx-auto max-w-[80%]">
@@ -74,8 +88,21 @@ const handleDeleteRecipe = () => {
                         Nova receita</button>
                 </div>
 
+                <div className="p-[.2rem] outline-3 outline-transparent focus-within:outline-gray-400 mt-8 rounded-lg">
+                    <div className="flex p-2 items-center gap-2 w-full outline  rounded-md focus-within:outline-black focus-within:outline-2">
+                    <Search color="gray" size={16} />
+                    <input
+            className="w-full focus:outline-none"
+            type="text"
+            placeholder="Pesquisar receitas por título, descrição, categoria ou ingredientes..."
+            value={search} 
+            onChange={(e) => setSearch(e.target.value)} 
+          />
+                </div>
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mt-8">
-                  {recipes.map((recipe) => (
+                  {filterRecipes.map((recipe) => (
                     <RecipeCard key={recipe.id} recipe={recipe}
                      onEdit={() => handleOpenEditModal(recipe)} 
                      onDelete={() => handleOpenDeleteConfirmationModal(recipe)}/> 
