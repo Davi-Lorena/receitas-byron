@@ -1,3 +1,4 @@
+"use client"
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { recipes } from "@/lib/data";
@@ -26,7 +27,7 @@ const FeaturedRecipes = recipes.slice(0, 3)
   
   <div className="flex flex-col sm:flex-row -w-full gap-8">
     {FeaturedRecipes.map((recipe) => (
-      <RecipeCard key={recipe.id} recipe={recipe} />
+      <RecipeCard key={recipe.id} recipe={recipe} onDelete={() => {}} onEdit={() => {}} />
     ))}
   </div>
 
