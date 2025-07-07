@@ -8,6 +8,7 @@ import type { Recipe } from "@/lib/data";
 import { Plus, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { set } from "react-hook-form";
+import { toast } from "sonner";
 
 export default function ReceitasPage() {
 const[isRecipeFormModalOpen, setIsRecipeFormModalOpen] = useState(false)
@@ -26,6 +27,7 @@ useEffect(() => {
 
         } catch (error) {
             console.error('Erro ao buscar receitas', error)
+            toast.error(`Erro ao buscar as receitas. Tente novamente mais tarde!`)
         }
     }
 
@@ -54,16 +56,20 @@ try {
 const response = await api.post('/recipes', recipeData)
 const newRecipe = response.data
 setRecipes((prev) => [...prev, newRecipe])
+toast.success(`Receita "${recipeData.title}" criada com sucesso!`)
     } 
  else { // edit mode 
 const updateRecipe = recipeData as Recipe
 const response = await api.put(`/recipes/${updateRecipe.id}`, updateRecipe)
 setRecipes((prev) => prev.map((recipe) => recipe.id === updateRecipe.id ? response.data : recipe))
-
+toast.success(`Receita "${recipeData.title}" editada com sucesso!`)
 }
 handleCloseModal()
+
+
 } catch (error) {
     console.error(`Erro ao ${modalMode === "create" ? "criar" : "editar"} a receita`, error)
+    toast.error(`Erro ao ${modalMode === "create" ? "criar" : "editar"} a receita`)
 }
 
 
@@ -82,9 +88,11 @@ const handleDeleteRecipe = async () => {
         setRecipes((prev) => prev.filter((recipe) => recipe.id !== selectedRecipe.id))
         setIsDeleteConfirmationModalOpen(false)
         setSelectedRecipe(undefined)
+        toast.success(`Receita excluída com sucesso!`)
     }
     } catch (error) {
         console.error('Erro ao deletar receita', error)
+        toast.error(`Erro ao deletar a receita!`)
     }
 }
 
