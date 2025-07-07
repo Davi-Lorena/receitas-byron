@@ -63,7 +63,7 @@ setRecipes((prev) => prev.map((recipe) => recipe.id === updateRecipe.id ? respon
 }
 handleCloseModal()
 } catch (error) {
-    
+    console.error(`Erro ao ${modalMode === "create" ? "criar" : "editar"} a receita`, error)
 }
 
 
