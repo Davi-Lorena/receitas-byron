@@ -7,6 +7,7 @@ import api from "@/lib/api";
 import type { Recipe } from "@/lib/data";
 import { Plus, Search } from "lucide-react";
 import { useEffect, useState } from "react";
+import { set } from "react-hook-form";
 
 export default function ReceitasPage() {
 const[isRecipeFormModalOpen, setIsRecipeFormModalOpen] = useState(false)
@@ -47,21 +48,24 @@ const handleCloseModal = () => {
     setIsRecipeFormModalOpen(false)
 }
 
-const handleSaveRecipe = (recipeData: Omit<Recipe, "id"> | Recipe) => { 
-if(modalMode === 'create') {
-
-
-    const newRecipe: Recipe = {  
-        ...recipeData,
-        id: (recipes.length + 1).toString()
+const handleSaveRecipe = async (recipeData: Omit<Recipe, "id"> | Recipe) => { 
+try {
+    if(modalMode === 'create') {
+const response = await api.post('/recipes', recipeData)
+const newRecipe = response.data
+setRecipes((prev) => [...prev, newRecipe])
     } 
-    setRecipes((prev) => [...prev, newRecipe]);
-} else { // edit mode 
+ else { // edit mode 
 const updateRecipe = recipeData as Recipe
 setRecipes((prev) => prev.map((recipe) => recipe.id === updateRecipe.id ? updateRecipe : recipe))
 
 }
 handleCloseModal()
+} catch (error) {
+    
+}
+
+
 }
 
 const handleOpenDeleteConfirmationModal = (recipe: Recipe) => {
