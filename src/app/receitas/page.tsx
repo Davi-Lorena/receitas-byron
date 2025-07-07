@@ -57,7 +57,8 @@ setRecipes((prev) => [...prev, newRecipe])
     } 
  else { // edit mode 
 const updateRecipe = recipeData as Recipe
-setRecipes((prev) => prev.map((recipe) => recipe.id === updateRecipe.id ? updateRecipe : recipe))
+const response = await api.put(`/recipes/${updateRecipe.id}`, updateRecipe)
+setRecipes((prev) => prev.map((recipe) => recipe.id === updateRecipe.id ? response.data : recipe))
 
 }
 handleCloseModal()
@@ -88,7 +89,7 @@ const filterRecipes = recipes.filter((recipe) => {
       recipe.description.toLowerCase().replace(/\s/g, '').includes(lowerCaseSearch) ||
       recipe.category.toLowerCase().replace(/\s/g, '').includes(lowerCaseSearch) ||
       recipe.ingredients.some(ingredient =>
-        ingredient.toLowerCase().includes(lowerCaseSearch))
+        ingredient.value.toLowerCase().includes(lowerCaseSearch))
 
       )
 })
