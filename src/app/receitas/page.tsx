@@ -3,19 +3,36 @@
 import DeleteConfirmationModal from "@/Components/DeleteConfirmationModal";
 import RecipeCard from "@/Components/RecipeCards";
 import RecipeFormModal from "@/Components/RecipeFormModal";
-import { recipes as initialRecipes } from "@/lib/data";
+import api from "@/lib/api";
 import type { Recipe } from "@/lib/data";
 import { Plus, Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { set } from "react-hook-form";
+import { toast } from "sonner";
 
 export default function ReceitasPage() {
 const[isRecipeFormModalOpen, setIsRecipeFormModalOpen] = useState(false)
 const [isDeleteConfirmationModalOpen, setIsDeleteConfirmationModalOpen] = useState(false)
-const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes)
+const [recipes, setRecipes] = useState<Recipe[]>([])
 const[modalMode, setModalMode] = useState<'create' | 'edit'>('create')
 const [selectedRecipe, setSelectedRecipe] = useState<Recipe | undefined>(undefined)
 
 const [search, setSearch] = useState('')
+
+useEffect(() => {
+    const fetchRecipes = async () => {
+        try {
+            const response = await api.get('/recipes')
+       setRecipes(response.data)
+
+        } catch (error) {
+            console.error('Erro ao buscar receitas', error)
+            toast.error(`Erro ao buscar as receitas. Tente novamente mais tarde!`)
+        }
+    }
+
+    fetchRecipes()
+}, [])
 
 const handleOpenCreateModal = () => {
     setModalMode('create')
@@ -33,21 +50,29 @@ const handleCloseModal = () => {
     setIsRecipeFormModalOpen(false)
 }
 
-const handleSaveRecipe = (recipeData: Omit<Recipe, "id"> | Recipe) => { 
-if(modalMode === 'create') {
-
-
-    const newRecipe: Recipe = {  
-        ...recipeData,
-        id: (recipes.length + 1).toString()
+const handleSaveRecipe = async (recipeData: Omit<Recipe, "id"> | Recipe) => { 
+try {
+    if(modalMode === 'create') {
+const response = await api.post('/recipes', recipeData)
+const newRecipe = response.data
+setRecipes((prev) => [...prev, newRecipe])
+toast.success(`Receita "${recipeData.title}" criada com sucesso!`)
     } 
-    setRecipes((prev) => [...prev, newRecipe]);
-} else { // edit mode 
+ else { // edit mode 
 const updateRecipe = recipeData as Recipe
-setRecipes((prev) => prev.map((recipe) => recipe.id === updateRecipe.id ? updateRecipe : recipe))
-
+const response = await api.put(`/recipes/${updateRecipe.id}`, updateRecipe)
+setRecipes((prev) => prev.map((recipe) => recipe.id === updateRecipe.id ? response.data : recipe))
+toast.success(`Receita "${recipeData.title}" editada com sucesso!`)
 }
 handleCloseModal()
+
+
+} catch (error) {
+    console.error(`Erro ao ${modalMode === "create" ? "criar" : "editar"} a receita`, error)
+    toast.error(`Erro ao ${modalMode === "create" ? "criar" : "editar"} a receita`)
+}
+
+
 }
 
 const handleOpenDeleteConfirmationModal = (recipe: Recipe) => {
@@ -55,11 +80,19 @@ setSelectedRecipe(recipe)
 setIsDeleteConfirmationModalOpen(true)
 }
 
-const handleDeleteRecipe = () => {
-    if(selectedRecipe) {
+const handleDeleteRecipe = async () => {
+    try {
+        if(selectedRecipe) {
+            await api.delete(`/recipes/${selectedRecipe.id}`)
+
         setRecipes((prev) => prev.filter((recipe) => recipe.id !== selectedRecipe.id))
         setIsDeleteConfirmationModalOpen(false)
         setSelectedRecipe(undefined)
+        toast.success(`Receita excluída com sucesso!`)
+    }
+    } catch (error) {
+        console.error('Erro ao deletar receita', error)
+        toast.error(`Erro ao deletar a receita!`)
     }
 }
 
@@ -70,7 +103,7 @@ const filterRecipes = recipes.filter((recipe) => {
       recipe.description.toLowerCase().replace(/\s/g, '').includes(lowerCaseSearch) ||
       recipe.category.toLowerCase().replace(/\s/g, '').includes(lowerCaseSearch) ||
       recipe.ingredients.some(ingredient =>
-        ingredient.toLowerCase().includes(lowerCaseSearch))
+        ingredient.value.toLowerCase().includes(lowerCaseSearch))
 
       )
 })
@@ -105,7 +138,7 @@ const filterRecipes = recipes.filter((recipe) => {
                   {filterRecipes.map((recipe) => (
                     <RecipeCard key={recipe.id} recipe={recipe}
                      onEdit={() => handleOpenEditModal(recipe)} 
-                     onDelete={() => handleOpenDeleteConfirmationModal(recipe)}/> 
+                     onDelete={() => handleOpenDeleteConfirmationModal(recipe)} mostrarBotaoEditar={true} mostrarBotaoDeletar={true}/> 
                     ))}
                 </div>
             </div>

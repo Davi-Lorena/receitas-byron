@@ -1,10 +1,13 @@
+"use client"
 import InfoPill from "@/Components/infoPill";
 import PreparationStep from "@/Components/preparationStep";
-import { recipes } from "@/lib/data";
+import api from "@/lib/api";
+import { Recipe } from "@/lib/data";
 import { ChevronLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface RecipePageProps {
     params: {
@@ -15,7 +18,33 @@ interface RecipePageProps {
 
 
 export default function ReceitaPage({ params }: RecipePageProps) {
-    const recipe = recipes.find((recipe) => recipe.id === params.id);
+    const [loading, setLoading] = useState(true)
+    const [recipe, setRecipe] = useState<Recipe | null>(null)
+    useEffect(() => {
+const fetchRecipe  = async () => { 
+    try {
+        const response  = await api.get(`/recipes/${params.id}`)
+        setRecipe(response.data)
+    } catch (error) {
+console.error("Erro ao requisitar receita", error)        
+    } finally {
+        setLoading(false)
+    }
+}
+fetchRecipe()
+    }, [])
+
+if(loading) {
+        return (
+            <main className="flex-grow -py8">
+                <div className="container mx-auto">
+                    <div className="flex justify-center">
+<p>Carregando receita...</p>
+                    </div>
+                </div>
+            </main>
+        )
+    }
 
 if(!recipe) {
     return notFound()
@@ -59,7 +88,7 @@ if(!recipe) {
     <h2 className="text-xl font-bold mb-4">Ingredientes</h2>
 <ul className="list-disc list-inside space-y-2">
 {recipe.ingredients.map((ingredient) => (
-    <li className="marker:text-orange-500" key={ingredient}>{ingredient}</li>
+    <li className="marker:text-orange-500" key={ingredient.value}>{ingredient.value}</li>
 ))}
 </ul>
 </div>
@@ -69,7 +98,7 @@ if(!recipe) {
     <h2 className="text-xl font-bold mb-4">Modo de preparo</h2>
 <ol className="space-y-4">
 {recipe.instructions.map((instruction, index) => (
-    <PreparationStep key={instruction} index={index + 1} description={instruction} />
+    <PreparationStep key={instruction.value} index={index + 1} description={instruction.value} />
 ))}
 
 </ol>
