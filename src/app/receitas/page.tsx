@@ -138,7 +138,7 @@ const filterRecipes = recipes.filter((recipe) => {
                   {filterRecipes.map((recipe) => (
                     <RecipeCard key={recipe.id} recipe={recipe}
                      onEdit={() => handleOpenEditModal(recipe)} 
-                     onDelete={() => handleOpenDeleteConfirmationModal(recipe)}/> 
+                     onDelete={() => handleOpenDeleteConfirmationModal(recipe)} mostrarBotaoEditar={true} mostrarBotaoDeletar={true}/> 
                     ))}
                 </div>
             </div>
