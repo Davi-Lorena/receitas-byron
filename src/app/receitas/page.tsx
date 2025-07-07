@@ -74,11 +74,17 @@ setSelectedRecipe(recipe)
 setIsDeleteConfirmationModalOpen(true)
 }
 
-const handleDeleteRecipe = () => {
-    if(selectedRecipe) {
+const handleDeleteRecipe = async () => {
+    try {
+        if(selectedRecipe) {
+            await api.delete(`/recipes/${selectedRecipe.id}`)
+
         setRecipes((prev) => prev.filter((recipe) => recipe.id !== selectedRecipe.id))
         setIsDeleteConfirmationModalOpen(false)
         setSelectedRecipe(undefined)
+    }
+    } catch (error) {
+        console.error('Erro ao deletar receita', error)
     }
 }
 
