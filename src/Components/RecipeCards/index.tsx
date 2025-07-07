@@ -7,32 +7,34 @@ import React from "react";
 
 interface RecipeCardProps {
   recipe: Recipe;
-  onEdit: () => void;
-  onDelete: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
+  mostrarBotaoEditar?: boolean;
+  mostrarBotaoDeletar?: boolean;
 }
 
 
-export default function RecipeCard({ recipe, onEdit, onDelete }: RecipeCardProps) {
+export default function RecipeCard({ recipe, onEdit, onDelete, mostrarBotaoEditar, mostrarBotaoDeletar}: RecipeCardProps) {
 
   const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
-    onEdit()
+    onEdit?.()
 }
 
 const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
-    onDelete()
+    onDelete?.()
 }
 
   return (
     <Link href={`/receitas/${recipe.id}`}>
-      <div className="border border-slate-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow h-[100%]">
+      <div className="flex flex-col border border-slate-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow h-[100%]">
         {/* Imagem */}
         <div className="relative h-48 w-full">
           <Image src={recipe.image} alt={recipe.title} fill className="object-cover" />
         </div>
        
-<div className="flex flex-col p-4 gap-6">
+<div className="flex flex-col justify-between p-4 gap-6 flex-grow">
      {/* Título e Descrição */}
         <div className="space-y-2">
           <h3 className="text-lg font-bold hover:text-orange-500 transition-colors">{recipe.title}</h3>
@@ -48,15 +50,12 @@ const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
 <div className="flex gap-2">
     {/* Botão de editar */}
 
-<button type="button" onClick={(e) => handleEdit(e)} className="p-2 border-gray-200 rounded hover:bg-gray-200 transition-colors hover:cursor-pointer">
-    <Edit size={16} />
-</button>
-
-{/* Botão de remover */}
-
-<button  type="button" onClick={(e) => handleDelete(e)}  className="p-2 border-gray-200 rounded hover:bg-gray-200 transition-colors hover:cursor-pointer">
+  {mostrarBotaoEditar && (<button type="button" onClick={(e) => handleEdit(e)} className="p-2 border-gray-200 rounded hover:bg-gray-200 transition-colors hover:cursor-pointer">
+    <Edit size={16} /> 
+</button>)} 
+{mostrarBotaoDeletar && (<button  type="button" onClick={(e) => handleDelete(e)}  className="p-2 border-gray-200 rounded hover:bg-gray-200 transition-colors hover:cursor-pointer">
     <Trash2 size={16} />
-</button>
+</button>)}
 
 </div>
 
